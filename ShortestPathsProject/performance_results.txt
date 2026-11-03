@@ -1,0 +1,96 @@
+Enter graph filename (example: weighted.txt): experiments
+Created inputs/unweighted_100.txt
+
+=== UNWEIGHTED GRPAH ===
+
+Runtime comparison
+vertices: 100| Edges: 400| Source: 0
+median of 7 runs; one warm-up excluded.
+
+Algorithm         Median time (ms)
+BFS               0.037256
+Bellman-Ford      0.112055
+Dijkstra          0.413801
+
+=== WEIGHTED GRAPH ===
+
+Runtime comparison
+vertices: 100| Edges: 400| Source: 0
+median of 7 runs; one warm-up excluded.
+
+Algorithm         Median time (ms)
+BFS               Skipped: weights must be 1
+Bellman-Ford      0.134310
+Dijkstra          0.412528
+Created inputs/unweighted_250.txt
+
+=== UNWEIGHTED GRPAH ===
+
+Runtime comparison
+vertices: 250| Edges: 1000| Source: 0
+median of 7 runs; one warm-up excluded.
+
+Algorithm         Median time (ms)
+BFS               0.085486
+Bellman-Ford      0.365073
+Dijkstra          2.366982
+
+=== WEIGHTED GRAPH ===
+
+Runtime comparison
+vertices: 250| Edges: 1000| Source: 0
+median of 7 runs; one warm-up excluded.
+
+Algorithm         Median time (ms)
+BFS               Skipped: weights must be 1
+Bellman-Ford      0.354027
+Dijkstra          2.461378
+Created inputs/unweighted_500.txt
+
+=== UNWEIGHTED GRPAH ===
+
+Runtime comparison
+vertices: 500| Edges: 2000| Source: 0
+median of 7 runs; one warm-up excluded.
+
+Algorithm         Median time (ms)
+BFS               0.147344
+Bellman-Ford      0.644635
+Dijkstra          7.977568
+
+=== WEIGHTED GRAPH ===
+
+Runtime comparison
+vertices: 500| Edges: 2000| Source: 0
+median of 7 runs; one warm-up excluded.
+
+Algorithm         Median time (ms)
+BFS               Skipped: weights must be 1
+Bellman-Ford      0.680676
+Dijkstra          7.458009
+Created inputs/unweighted_1000.txt
+
+=== UNWEIGHTED GRPAH ===
+
+Runtime comparison
+vertices: 1000| Edges: 4000| Source: 0
+median of 7 runs; one warm-up excluded.
+
+Algorithm         Median time (ms)
+BFS               0.226239
+Bellman-Ford      0.870966
+Dijkstra          28.340166
+
+=== WEIGHTED GRAPH ===
+
+Runtime comparison
+vertices: 1000| Edges: 4000| Source: 0
+median of 7 runs; one warm-up excluded.
+
+Algorithm         Median time (ms)
+BFS               Skipped: weights must be 1
+Bellman-Ford      1.286450
+Dijkstra          29.293670
+
+All performance experiments finished.
+Program ended with exit code: 0
