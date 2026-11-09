@@ -18,26 +18,21 @@ struct Neighbor {
     long long weight;
 };
 
-void printPath(const vector<int>& parent,
-               int source,
-               int destination) {
-
+void printPath(const vector<int>& parent, int source, int destination) {
     vector<int> path;
     int current = destination;
 
-    // Follow parents backward. The limit prevents an endless loop
-    // if an invalid parent chain is accidentally supplied.
     for (size_t step = 0; step < parent.size(); step++) {
         if (current < 0 ||
             current >= static_cast<int>(parent.size())) {
             break;
         }
 
-        path.push_back(current);
+        path.push_back(current); // the first element gets added, our destination, remember we're workink backwards, we keep getting more and more elements until were done.
+        
+        if (current == source) { // ie, if we're done with the pathing, like we reached the begining.
+            // print backward through the vector to show the path from source to destination.
 
-        if (current == source) {
-            // Print backward through the vector to show
-            // the path from source to destination.
             for (size_t i = path.size(); i > 0; i--) {
                 cout << path[i - 1];
 
@@ -47,36 +42,34 @@ void printPath(const vector<int>& parent,
             }
             return;
         }
-
+// if we arent at the end, current gets replaced by the parent of the current we were just at
         current = parent[current];
     }
 
     cout << "Invalid parent chain";
 }
 
-void bellmanFord(int vertices, const vector<Edge>& edgeList, int source, bool showResults = true,
-                 double* measuredTime = nullptr) {
+void bellmanFord(int vertices, const vector<Edge>& edgeList, int source, bool                   showResults = true, double* measuredTime = nullptr) {
     if (source < 0 || source >= vertices) {
         cerr << "Invalid source vertex." << endl;
-        return;
+        return; // lets make sure youre even valid
     }
 
-    const long long INF = numeric_limits<long long>::max();
+    const long long INF = numeric_limits<long long>::max(); // infinity
 
     // INF means we have not found a path to this vertex.
-    auto startTime = chrono::steady_clock::now();
+    auto startTime = chrono::steady_clock::now(); // the clock starts.
     vector<long long> distance(vertices, INF);
-    vector<int> parent(vertices, -1);
+    vector<int> parent(vertices, -1); //
 
     distance[source] = 0;
 
-    // Safely calculate a path's distance.
+    // calculate a path's distance
     auto calculateDistance = [&](long long current,
                                  long long weight,
                                  long long& result) -> bool {
         if ((weight > 0 && current >= INF - weight) ||
-            (weight < 0 &&
-             current < numeric_limits<long long>::min() - weight)) {
+            (weight < 0 && current < numeric_limits<long long>::min() - weight)) {
             cerr << "Path distance exceeds the supported range." << endl;
             return false;
         }
@@ -85,23 +78,24 @@ void bellmanFord(int vertices, const vector<Edge>& edgeList, int source, bool sh
         return true;
     };
 
-    // A shortest path without cycles uses at most V - 1 edges.
+    // shortest path without cycles at most V - 1 edges
     for (int pass = 0; pass < vertices - 1; pass++) {
-        bool changed = false;
+        bool changed = false; // at the begining of each pass, we assume no distances will improve. if we find a shorter path durring this pass we will make it true
 
         for (const Edge& edge : edgeList) {
-            // Skip edges whose starting vertex is unreachable.
+            // skip edges whose starting vertex is infinity
             if (distance[edge.from] == INF) {
-                continue;
+                continue; // skip the rest of the loop but start over
+                //suppose we have a route 2 -> 3 weight 4, but we have not discovered a route to 2 yet. so 2 is infinity, if the distance of 2, edge.from, is infinity, go to the next edge
             }
-
+            
             long long candidate;
-            if (!calculateDistance(distance[edge.from],
-                                   edge.weight, candidate)) {
+            if (!calculateDistance(distance[edge.from],edge.weight, candidate)) {
                 return;
+                // if calculating this distance is unsafe, exit bellmanford
+                
             }
-
-            // Relax the edge: keep the shorter path.
+            // relax the edge. keep the shorter path.
             if (candidate < distance[edge.to]) {
                 distance[edge.to] = candidate;
                 parent[edge.to] = edge.from;
@@ -109,27 +103,25 @@ void bellmanFord(int vertices, const vector<Edge>& edgeList, int source, bool sh
             }
         }
 
-        // No improvements means the distances are finished.
+        // no improvements means the distances are finished.
         if (!changed) {
             break;
         }
     }
 
-    // One additional pass checks for a reachable negative cycle.
+    // one additional pass checks for a reachable negative cycle.
     for (const Edge& edge : edgeList) {
         if (distance[edge.from] == INF) {
             continue;
         }
 
         long long candidate;
-        if (!calculateDistance(distance[edge.from],
-                               edge.weight, candidate)) {
+        if (!calculateDistance(distance[edge.from], edge.weight, candidate)) {
             return;
         }
 
         if (candidate < distance[edge.to]) {
-            cout << "\nA negative cycle is reachable from vertex "
-                 << source << "." << endl;
+            cout << "\nA negative cycle is reachable from vertex " << source << "." << endl;
             cout << "Shortest distances are not defined for vertices "
                  << "affected by that cycle." << endl;
             return;
@@ -183,22 +175,25 @@ void dijkstra(int vertices, const vector<vector<Neighbor>>& adjacency, int sourc
 
     const long long INF = numeric_limits<long long>::max();
 
-    // Step 1: Initialize distances, parents, and visited status.
+    // initialize distances, parents, and visited status.
     auto startTime = chrono::steady_clock::now();
     vector<long long> distance(vertices, INF);
     vector<int> parent(vertices, -1);
     vector<bool> visited(vertices, false);
 
-    // Step 2: The source is distance 0 from itself.
+    // the source has a distance of 0 from itself.
     distance[source] = 0;
 
     for (int step = 0; step < vertices; step++) {
 
-        // Step 3: Find the closest reachable, unvisited vertex.
+        // find the closest reachable, unvisited vertex.
         int current = -1;
         long long smallestDistance = INF;
 
         for (int vertex = 0; vertex < vertices; vertex++) {
+            
+            // select a vertex only if it has not been visited and its distance is smaller than our best candidate.
+            
             if (!visited[vertex] &&
                 distance[vertex] < smallestDistance) {
 
@@ -212,39 +207,41 @@ void dijkstra(int vertices, const vector<vector<Neighbor>>& adjacency, int sourc
             break;
         }
 
-        // Step 4: This vertex's shortest distance is finalized.
+        // this vertex's shortest distance is finalized.
         visited[current] = true;
 
-        // Step 5: Try to improve distances to its neighbors.
+        // try to improve distances to its neighbors.
         for (const Neighbor& neighbor : adjacency[current]) {
             int next = neighbor.vertex;
 
             if (visited[next]) {
                 continue;
             }
+            //skips distances that are already finalized
 
-            // Prevent overflow; INF is reserved for unreachable.
+            // prevent overflow. INF is reserved for unreachable.
             if (neighbor.weight >= INF - distance[current]) {
                 cerr << "Path distance exceeds the supported range."
                      << endl;
                 return;
             }
-
+            //calculate a possible shorter path
             long long candidate =
                 distance[current] + neighbor.weight;
-
+            
+            // Update the shortest distance and parent if the new route is better than the existing one.
             if (candidate < distance[next]) {
                 distance[next] = candidate;
                 parent[next] = current;
             }
         }
 
-        // Step 6: The loop repeats with the next closest vertex.
+        // the loop repeats with the next closest vertex.
     }
-    
-    auto endTime = chrono::steady_clock::now();
+    //stop the timer and calculate runtime.
+    auto endTime = chrono::steady_clock::now(); //
     double runtimeMs = chrono::duration<double, milli>(endTime - startTime).count();
-    
+    //store the runtime if the caller requested it
     if (measuredTime != nullptr){
         *measuredTime = runtimeMs;
     }
@@ -349,17 +346,17 @@ void generateUnweightedGraph(int vertices) {
 
     vector<Edge> generatedEdges;
 
-    // A fixed seed makes the generated input reproducible.
+    // a fixed seed makes the generated input reproducible.
     mt19937 generator(42);
     uniform_int_distribution<int> pickVertex(0, vertices - 1);
 
     for (int from = 0; from < vertices; from++) {
         vector<int> targets;
 
-        // Connect vertices in a cycle so all are reachable.
+        // connect vertices in a cycle so all are reachable.
         targets.push_back((from + 1) % vertices);
 
-        // Give each vertex four distinct outgoing edges.
+        // give each vertex four distinct outgoing edges.
         while (targets.size() < 4) {
             int to = pickVertex(generator);
             bool duplicate = false;
@@ -381,7 +378,7 @@ void generateUnweightedGraph(int vertices) {
         }
     }
 
-    // Shuffle edge order so edges are not grouped by vertex.
+    // shuffle edge order so edges are not grouped by vertex.
     for (size_t i = generatedEdges.size(); i > 1; i--) {
         uniform_int_distribution<size_t> pickIndex(0, i - 1);
         size_t j = pickIndex(generator);
@@ -575,9 +572,9 @@ void runExperiments(){
 }
 
 int main() {
-    //generateUnweightedGraph(250);
-    //generateUnweightedGraph(500);
-    //generateUnweightedGraph(1000);
+    generateUnweightedGraph(250);
+    generateUnweightedGraph(500);
+    generateUnweightedGraph(1000);
     string filename;
 
     cout << "Enter graph filename (example: weighted.txt): ";
